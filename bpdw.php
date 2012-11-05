@@ -32,6 +32,10 @@ add_action( 'bp_docs_doc_saved',              'bpdw_save_metadata' );
 // Redirection
 add_action( 'bp_screens',                     'bpdw_maybe_redirect' );
 
+// Translations
+add_filter( 'gettext',                        'bpdw_filter_gettext', 10, 3 );
+
+
 /**
  * Returns the BuddyPress Docs Wiki slug - 'wiki'
  */
@@ -80,8 +84,6 @@ function bpdw_query_vars( $vars ) {
  */
 function bpdw_generate_rewrite_rules( $wp_rewrite ) {
 	$rules = array(
-		bpdw_slug() . '(.+?)(/[0-9]+)?/?$' =>
-			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&bpdw_is_wiki=1',
 		bpdw_slug() . '/' . BP_DOCS_CREATE_SLUG . '/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&' . BP_DOCS_CREATE_SLUG . '=1' . '&bpdw_is_wiki=1',
 		bpdw_slug() . '/([^/]+)/' . BP_DOCS_EDIT_SLUG . '/?$' =>
@@ -90,6 +92,8 @@ function bpdw_generate_rewrite_rules( $wp_rewrite ) {
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&' . BP_DOCS_HISTORY_SLUG . '=1' . '&bpdw_is_wiki=1',
 		bpdw_slug() . '/([^/]+)/' . BP_DOCS_DELETE_SLUG . '/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&' . BP_DOCS_HISTORY_SLUG . '=1' . '&bpdw_is_wiki=1',
+		bpdw_slug() . '(.+?)(/[0-9]+)?/?$' =>
+			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&bpdw_is_wiki=1',
 	);
 
 	$wp_rewrite->rules = array_merge( $rules, $wp_rewrite->rules );
@@ -186,6 +190,38 @@ function bpdw_maybe_redirect() {
 			bp_core_redirect( $redirect_to );
 		}
 	}
+}
+
+/**
+ * Catch the text on the way through gettext, and translate
+ */
+function bpdw_filter_gettext( $translation, $text, $domain ) {
+
+	if ( 'bp-docs' != $domain || ! bpdw_is_wiki() ) {
+		return $translation;
+	}
+
+	$translations = &get_translations_for_domain( 'bp-docs' );
+
+	switch( $text ){
+		case 'Tags are words or phrases that help to describe and organize your Docs.':
+			return __( 'Tags are words or phrases that help to describe and organize your wiki pages.', 'bp-docs-wiki' );
+			break;
+		case 'Select a parent for this Doc.':
+			return __( 'Select a parent for this wiki page.', 'bp-docs-wiki' );
+			break;
+		case '(Optional) Assigning a parent Doc means that a link to the parent will appear at the bottom of this Doc, and a link to this Doc will appear at the bottom of the parent.' :
+			return __( '(Optional) Assigning a parent that a link to the parent will appear at the bottom of this wiki page, and a link to this page will appear at the bottom of the parent.', 'bp-docs-wiki' );
+			break;
+		case 'There are no comments for this doc yet.':
+			return __( 'There are no comments yet.', 'bp-docs-wiki' );
+			break;
+		case 'Create New Doc':
+			return __( 'Create New Wiki Page', 'bp-docs-wiki' );
+			break;
+	}
+
+	return $translation;
 }
 
 
