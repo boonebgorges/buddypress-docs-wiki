@@ -306,6 +306,9 @@ function bpdw_filter_gettext( $translation, $text, $domain ) {
 	}
 
 	switch( $text ){
+		case 'New Doc':
+			return __( 'New Wiki Page', 'bp-docs-wiki' );
+			break;
 		case 'Tags are words or phrases that help to describe and organize your Docs.':
 			return __( 'Tags are words or phrases that help to describe and organize your wiki pages.', 'bp-docs-wiki' );
 			break;
@@ -323,6 +326,9 @@ function bpdw_filter_gettext( $translation, $text, $domain ) {
 			break;
 		case 'Docs Directory':
 			return __( 'Wiki', 'bp-docs-wiki' );
+			break;
+		case 'You are viewing docs with the following tags: %s' :
+			return __( 'You are viewing wiki pages with the following tags: %s', 'bp-docs-wiki' );
 			break;
 		case 'You are searching for docs containing the term <em>%s</em>' :
 			return __( 'You are searching for wiki pages containing the term <em>%s</em>', 'bp-docs-wiki' );
