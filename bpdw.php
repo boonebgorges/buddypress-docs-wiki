@@ -26,6 +26,7 @@ add_filter( 'bp_docs_locate_template',        'bpdw_filter_home_template', 10, 2
 add_action( 'widgets_init',                   'bpdw_register_sidebars' );
 add_action( 'wp_enqueue_scripts',             'bpdw_enqueue_styles' );
 add_action( 'bp_docs_sidebar_template',	      'bpdw_filter_bp_docs_sidebar' );
+add_action( 'bp_screens',                     'bpdw_remove_group_column', 5 );
 
 // Widgets
 add_action( 'widgets_init',                   'bpdw_widgets_init' );
@@ -400,6 +401,17 @@ function bpdw_filter_bp_docs_sidebar( $template ) {
 	}
 
 	return $template;
+}
+
+function bpdw_remove_group_column() {
+	global $bp;
+
+	if ( bpdw_is_wiki() ) {
+		if ( isset( $bp->bp_docs->groups_integration ) && method_exists( $bp->bp_docs->groups_integration, 'groups_th' ) ) {
+			remove_filter( 'bp_docs_loop_additional_th', array( $bp->bp_docs->groups_integration, 'groups_th' ), 5 );
+			remove_filter( 'bp_docs_loop_additional_td', array( $bp->bp_docs->groups_integration, 'groups_td' ), 5 );
+		}
+	}
 }
 
 function bpdw_filter_body_class( $class ) {
