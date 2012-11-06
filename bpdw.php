@@ -252,7 +252,7 @@ function bpdw_canonical_address( $doc_id = false ) {
 		$doc_id = get_the_ID();
 	}
 
-	$is_wiki_doc = bpdw_is_wiki_doc( get_the_ID() );
+	$is_wiki_doc = bpdw_is_wiki_doc( $doc_id );
 
 	if ( $is_wiki_doc ) {
 		$url = str_replace( home_url( bp_docs_get_slug() ), home_url( bpdw_slug() ), get_permalink( $doc_id ) );
