@@ -37,6 +37,7 @@ add_action( 'bp_docs_taxonomy_saved',         'bpdw_mirror_tags' );
 // Redirection
 add_action( 'bp_screens',                     'bpdw_maybe_redirect' );
 add_filter( 'bp_docs_get_doc_link',           'bpdw_filter_doc_link', 10, 2 );
+add_filter( 'bp_docs_get_archive_link',       'bpdw_filter_archive_link' );
 
 // Translations
 add_filter( 'gettext',                        'bpdw_filter_gettext', 10, 3 );
@@ -285,6 +286,13 @@ function bpdw_maybe_redirect() {
  */
 function bpdw_filter_doc_link( $link, $doc_id ) {
 	return bpdw_canonical_address( $doc_id );
+}
+
+function bpdw_filter_archive_link( $link ) {
+	if ( bpdw_is_wiki() ) {
+		$link = trailingslashit( home_url( bpdw_slug() ) );
+	}
+	return $link;
 }
 
 /**
