@@ -1,3 +1,7 @@
+body.wiki div#subnav.item-list-tabs li {
+	display: none;
+}
+
 .wiki-home-sidebar {
 	overflow: hidden;
 	margin-top: 2em;

@@ -376,7 +376,7 @@ function bpdw_register_sidebars() {
 }
 
 function bpdw_enqueue_styles() {
-	if ( bpdw_is_wiki_home() ) {
+	if ( bpdw_is_wiki() ) {
 		wp_enqueue_style( 'bp-docs-wiki-home', plugins_url() . '/buddypress-docs-wiki/wiki-home.css' );
 	}
 }
