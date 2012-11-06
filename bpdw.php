@@ -42,6 +42,10 @@ add_filter( 'bp_docs_get_doc_link',           'bpdw_filter_doc_link', 10, 2 );
 // Translations
 add_filter( 'gettext',                        'bpdw_filter_gettext', 10, 3 );
 
+// Page title and class
+add_filter( 'body_class',                     'bpdw_filter_body_class' );
+add_filter( 'wp_title',                       'bpdw_filter_page_title' );
+
 
 /**
  * Returns the BuddyPress Docs Wiki slug - 'wiki'
@@ -382,6 +386,20 @@ function bpdw_filter_bp_docs_sidebar( $template ) {
 	}
 
 	return $template;
+}
+
+function bpdw_filter_body_class( $class ) {
+	if ( bpdw_is_wiki() ) {
+		$class[] = 'wiki';
+	}
+	return $class;
+}
+
+function bpdw_filter_page_title( $title ) {
+	if ( bpdw_is_wiki() ) {
+		$title = str_replace( __( 'BuddyPress Docs', 'bp-docs' ), __( 'Wiki', 'bp-docs-wiki' ), $title );
+	}
+	return $title;
 }
 
 function bpdw_widgets_init() {
