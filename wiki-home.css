@@ -12,3 +12,14 @@
 		margin-right: 0;
 	}
 
+/* WIDGETS */
+
+/* WIDGETS */
+.wiki-home li.odd,
+.wiki-home li.even {
+	padding: 10px 20px;
+}
+
+.wiki-home li.even {
+	background: #eee;
+}

@@ -28,6 +28,9 @@ add_filter( 'bp_docs_locate_template',        'bpdw_filter_home_template', 10, 2
 add_action( 'widgets_init',                   'bpdw_register_sidebars' );
 add_action( 'wp_enqueue_scripts',             'bpdw_enqueue_styles' );
 
+// Widgets
+add_action( 'widgets_init',                   'bpdw_widgets_init' );
+
 // Metadata
 add_action( 'bp_docs_doc_saved',              'bpdw_save_metadata' );
 
@@ -319,3 +322,163 @@ function bpdw_get_sidebar() {
 
 	load_template( $template );
 }
+
+function bpdw_widgets_init() {
+	register_widget( 'BPDW_Recently_Active_Widget' );
+	register_widget( 'BPDW_Most_Active_Widget' );
+}
+
+/**
+ * Recently Active Wiki Pages
+ */
+class BPDW_Recently_Active_Widget extends WP_Widget {
+	public function __construct() {
+		parent::__construct(
+			'bpdw_recently_active',
+			__( '(Wiki) Recently Active Pages', 'bp-docs-wiki' ),
+			array(
+				'description' => __( 'A list of recently active wiki pages.', 'bp-docs-wiki' )
+			)
+		);
+	}
+
+	public function form( $instance ) {
+		$defaults = array(
+			'title'     => __( 'Recently Active', 'bp-docs-wiki' ),
+			'max_pages' => 5,
+		);
+		$instance = wp_parse_args( (array) $instance, $defaults );
+
+		$title     = strip_tags( $instance['title'] );
+		$max_pages = strip_tags( $instance['max_pages'] );
+
+		?>
+		<p><label for="<?php echo $this->get_field_id( 'title' ) ?>"><?php _e( 'Title:', 'bp-docs-wiki' ); ?> <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" style="width: 100%" /></label></p>
+		<p><label for="<?php echo $this->get_field_id( 'max_pages' ) ?>"><?php _e('Number of posts to show:', 'bp-docs-wiki'); ?> <input class="widefat" id="<?php echo $this->get_field_id( 'max_pages' ); ?>" name="<?php echo $this->get_field_name( 'max_pages' ); ?>" type="text" value="<?php echo esc_attr( $max_pages ); ?>" style="width: 30%" /></label></p>
+		<?php
+	}
+
+	public function update( $new_instance, $old_instance ) {
+		$instance = $old_instance;
+
+		$instance['title']     = strip_tags( $new_instance['title'] );
+		$instance['max_pages'] = strip_tags( $new_instance['max_members'] );
+
+		return $new_instance;
+	}
+
+	public function widget( $args, $instance ) {
+		wp_enqueue_style( 'bp-docs-wiki-home', plugins_url() . '/buddypress-docs-wiki/wiki-home.css' );
+
+		extract( $args );
+		echo $before_widget;
+		echo $before_title
+		   . $instance['title']
+		   . $after_title;
+
+		$docs_args = array(
+			'posts_per_page' => $instance['max_pages'],
+			'orderby' => 'modified',
+		);
+
+		$counter = 2; // Start with a weird number so as not to break the modulo
+		bp_docs_reset_query();
+		if ( bp_docs_has_docs( $docs_args ) ) {
+			echo '<ul>';
+			while ( bp_docs_has_docs() ) {
+				bp_docs_the_doc();
+				$zebra = $counter % 2 ? 'odd' : 'even';
+
+				echo '<li class="' . $zebra . '">';
+				echo '<div class="wiki-page-title"><a href="' . get_permalink() . '">' . get_the_title() . '</a></div>';
+				echo '<div class="wiki-page-excerpt">' . get_the_excerpt() . '</div>';
+				echo '</li>';
+
+				$counter++;
+			}
+			echo '</ul>';
+		}
+
+		echo $after_widget;
+	}
+
+
+}
+
+/**
+ * Most Active Wiki Pages
+ */
+class BPDW_Most_Active_Widget extends WP_Widget {
+	public function __construct() {
+		parent::__construct(
+			'bpdw_most_active',
+			__( '(Wiki) Most Active Pages', 'bp-docs-wiki' ),
+			array(
+				'description' => __( 'A list of most active wiki pages.', 'bp-docs-wiki' )
+			)
+		);
+	}
+
+	public function form( $instance ) {
+		$defaults = array(
+			'title'     => __( 'Most Active', 'bp-docs-wiki' ),
+			'max_pages' => 5,
+		);
+		$instance = wp_parse_args( (array) $instance, $defaults );
+
+		$title     = strip_tags( $instance['title'] );
+		$max_pages = strip_tags( $instance['max_pages'] );
+
+		?>
+		<p><label for="<?php echo $this->get_field_id( 'title' ) ?>"><?php _e( 'Title:', 'bp-docs-wiki' ); ?> <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" style="width: 100%" /></label></p>
+		<p><label for="<?php echo $this->get_field_id( 'max_pages' ) ?>"><?php _e('Number of posts to show:', 'bp-docs-wiki'); ?> <input class="widefat" id="<?php echo $this->get_field_id( 'max_pages' ); ?>" name="<?php echo $this->get_field_name( 'max_pages' ); ?>" type="text" value="<?php echo esc_attr( $max_pages ); ?>" style="width: 30%" /></label></p>
+		<?php
+	}
+
+	public function update( $new_instance, $old_instance ) {
+		$instance = $old_instance;
+
+		$instance['title']     = strip_tags( $new_instance['title'] );
+		$instance['max_pages'] = strip_tags( $new_instance['max_members'] );
+
+		return $new_instance;
+	}
+
+	public function widget( $args, $instance ) {
+		wp_enqueue_style( 'bp-docs-wiki-home', plugins_url() . '/buddypress-docs-wiki/wiki-home.css' );
+
+		extract( $args );
+		echo $before_widget;
+		echo $before_title
+		   . $instance['title']
+		   . $after_title;
+
+		$docs_args = array(
+			'posts_per_page' => $instance['max_pages'],
+			'orderby' => 'most_active',
+		);
+
+		$counter = 2; // Start with a weird number so as not to break the modulo
+		bp_docs_reset_query();
+		if ( bp_docs_has_docs( $docs_args ) ) {
+			echo '<ul>';
+			while ( bp_docs_has_docs() ) {
+				bp_docs_the_doc();
+				$zebra = $counter % 2 ? 'odd' : 'even';
+
+				echo '<li class="' . $zebra . '">';
+				echo '<div class="wiki-page-title"><a href="' . get_permalink() . '">' . get_the_title() . '</a></div>';
+				echo '<div class="wiki-page-excerpt">' . get_the_excerpt() . '</div>';
+				echo '</li>';
+
+				$counter++;
+			}
+			echo '</ul>';
+		}
+
+		echo $after_widget;
+	}
+
+
+}
+
