@@ -2,8 +2,7 @@
 
 /**
  * Todo:
- * - Page <title>
- * - Widgets
+ * - Nav menu, esp current state
  */
 
 if ( ! defined( 'BP_DOCS_WIKI_SLUG' ) ) {
@@ -42,10 +41,10 @@ add_filter( 'bp_docs_get_doc_link',           'bpdw_filter_doc_link', 10, 2 );
 // Translations
 add_filter( 'gettext',                        'bpdw_filter_gettext', 10, 3 );
 
-// Page title and class
+// Page title, class, nav menu
 add_filter( 'body_class',                     'bpdw_filter_body_class' );
 add_filter( 'wp_title',                       'bpdw_filter_page_title' );
-
+add_filter( 'nav_menu_css_class',             'bpdw_filter_current_nav_menu', 10, 3 );
 
 /**
  * Returns the BuddyPress Docs Wiki slug - 'wiki'
@@ -415,6 +414,20 @@ function bpdw_filter_page_title( $title ) {
 		$title = str_replace( __( 'BuddyPress Docs', 'bp-docs' ), __( 'Wiki', 'bp-docs-wiki' ), $title );
 	}
 	return $title;
+}
+
+function bpdw_filter_current_nav_menu( $classes, $item, $args ) {
+	if ( bpdw_is_wiki() ) {
+		if ( bpdw_slug() == $item->post_name ) {
+			$classes[] = 'current-menu-item';
+		} else {
+			$key = array_search( 'current-menu-item', $classes );
+			if ( false !== $key ) {
+				unset( $classes[ $key ] );
+			}
+		}
+	}
+	return $classes;
 }
 
 function bpdw_widgets_init() {
