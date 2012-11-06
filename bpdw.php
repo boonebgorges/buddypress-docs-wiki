@@ -222,9 +222,9 @@ function bpdw_maybe_redirect() {
 		$is_wiki_doc = bpdw_is_wiki_doc( get_the_ID() );
 
 		if ( $is_wiki_url && ! $is_wiki_doc ) {
-			$redirect_to = str_replace( home_url( bpdw_slug() ), home_url( bp_docs_get_slug() ), get_permalink() );
+			$redirect_to = str_replace( home_url( bpdw_slug() ), home_url( bp_docs_get_slug() ), wp_guess_url() );
 		} else if ( ! $is_wiki_url && $is_wiki_doc ) {
-			$redirect_to = str_replace( home_url( bp_docs_get_slug() ), home_url( bpdw_slug() ), get_permalink() );
+			$redirect_to = str_replace( home_url( bp_docs_get_slug() ), home_url( bpdw_slug() ), wp_guess_url() );
 		}
 
 		if ( isset( $redirect_to ) ) {
