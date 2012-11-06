@@ -44,3 +44,8 @@ body.wiki div#subnav.item-list-tabs li {
 .wiki-home li.even {
 	background: #eee;
 }
+
+.wiki-home .wiki-home-sidebar ul {
+	list-style-type: none;
+	padding-left: 0
+}
