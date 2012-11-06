@@ -2,9 +2,8 @@
 
 /**
  * Todo:
- * - Translation mangler
- * - Wiki homepage loader
  * - Wiki homepage template
+ * - Page <title>
  * - Widgets
  */
 
@@ -25,6 +24,9 @@ add_filter( 'bp_docs_allow_access_settings',  'bpdw_allow_access_settings' );
 
 // Directories
 add_filter( 'bp_docs_pre_query_args',         'bpdw_filter_query_args' );
+add_filter( 'bp_docs_locate_template',        'bpdw_filter_home_template', 10, 2 );
+add_action( 'widgets_init',                   'bpdw_register_sidebars' );
+add_action( 'wp_enqueue_scripts',             'bpdw_enqueue_styles' );
 
 // Metadata
 add_action( 'bp_docs_doc_saved',              'bpdw_save_metadata' );
@@ -52,6 +54,14 @@ function bpdw_is_wiki() {
 }
 
 /**
+ * Are we looking at the wiki home page?
+ */
+function bpdw_is_wiki_home() {
+	global $wp_query;
+	return 1 == $wp_query->get( 'bpdw_is_wiki_home' );
+}
+
+/**
  * Is a given doc a Wiki doc?
  */
 function bpdw_is_wiki_doc( $doc_id ) {
@@ -76,6 +86,7 @@ function bpdw_is_wiki_doc( $doc_id ) {
  */
 function bpdw_query_vars( $vars ) {
 	$vars[] = 'bpdw_is_wiki';
+	$vars[] = 'bpdw_is_wiki_home';
 	return $vars;
 }
 
@@ -94,6 +105,8 @@ function bpdw_generate_rewrite_rules( $wp_rewrite ) {
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&' . BP_DOCS_HISTORY_SLUG . '=1' . '&bpdw_is_wiki=1',
 		bpdw_slug() . '(.+?)(/[0-9]+)?/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&bpdw_is_wiki=1',
+		bpdw_slug() . '/?$' =>
+			'index.php?post_type=' . bp_docs_get_post_type_name() . '&bpdw_is_wiki=1&bpdw_is_wiki_home=1',
 	);
 
 	$wp_rewrite->rules = array_merge( $rules, $wp_rewrite->rules );
@@ -132,9 +145,18 @@ function bpdw_allow_access_settings( $allow ) {
 	return $allow;
 }
 
+/**
+ * Make sure that only wiki pages appear on wiki directories, and that no
+ * wiki pages appear on non-wiki directories
+ */
 function bpdw_filter_query_args( $args ) {
 	if ( bpdw_is_wiki() ) {
-
+		$args['tax_query'][] = array(
+			'taxonomy' => 'bpdw_is_wiki',
+			'terms'    => '1',
+			'operator' => 'IN',
+			'field'    => 'name',
+		);
 	} else {
 		$args['tax_query'][] = array(
 			'taxonomy' => 'bpdw_is_wiki',
@@ -145,6 +167,22 @@ function bpdw_filter_query_args( $args ) {
 	}
 
 	return $args;
+}
+
+function bpdw_filter_home_template( $template_path, $template ) {
+	if ( bpdw_is_wiki_home() && 'archive-bp_doc.php' == $template ) {
+		$child  = get_stylesheet_directory();
+		$parent = get_template_directory();
+
+		if ( file_exists( trailingslashit( $child ) . 'docs/wiki-home.php' ) ) {
+			$template_path = trailingslashit( $child ) . 'docs/wiki-home.php';
+		} else if ( file_exists( trailingslashit( $parent ) . 'docs/wiki-home.php' ) ) {
+			$template_path = trailingslashit( $parent ) . 'docs/wiki-home.php';
+		} else {
+			$template_path = trailingslashit( dirname(__FILE__) ) . 'wiki-home.php';
+		}
+	}
+	return $template_path;
 }
 
 /**
@@ -201,8 +239,6 @@ function bpdw_filter_gettext( $translation, $text, $domain ) {
 		return $translation;
 	}
 
-	$translations = &get_translations_for_domain( 'bp-docs' );
-
 	switch( $text ){
 		case 'Tags are words or phrases that help to describe and organize your Docs.':
 			return __( 'Tags are words or phrases that help to describe and organize your wiki pages.', 'bp-docs-wiki' );
@@ -224,4 +260,62 @@ function bpdw_filter_gettext( $translation, $text, $domain ) {
 	return $translation;
 }
 
+function bpdw_register_sidebars() {
+	register_sidebar( array(
+		'name'          => __( 'Wiki Top', 'bp-docs-wiki' ),
+		'id'            => 'wiki-top',
+		'description'   => __( 'The full-width area at the top of the Wiki home page', 'bp-docs-wiki' ),
+		'before_widget' => '<div id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</div>',
+		'before_title'  => '<h3>',
+		'after_title'   => '</h3>'
+	) );
 
+	register_sidebar( array(
+		'name'          => __( 'Wiki Bottom Left', 'bp-docs-wiki' ),
+		'id'            => 'wiki-bottom-left',
+		'description'   => __( 'The half-width area at the bottom-left of the Wiki home page', 'bp-docs-wiki' ),
+		'before_widget' => '<div id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</div>',
+		'before_title'  => '<h3>',
+		'after_title'   => '</h3>'
+	) );
+
+	register_sidebar( array(
+		'name'          => __( 'Wiki Bottom Right', 'bp-docs-wiki' ),
+		'id'            => 'wiki-bottom-right',
+		'description'   => __( 'The half-width area at the bottom-right of the Wiki home page', 'bp-docs-wiki' ),
+		'before_widget' => '<div id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</div>',
+		'before_title'  => '<h3>',
+		'after_title'   => '</h3>'
+	) );
+
+	register_sidebar( array(
+		'name'          => __( 'Wiki Sidebar', 'bp-docs-wiki' ),
+		'id'            => 'wiki-sidebar',
+		'description'   => __( 'The sidebar on the Wiki home page', 'bp-docs-wiki' ),
+		'before_widget' => '<div id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</div>',
+		'before_title'  => '<h3>',
+		'after_title'   => '</h3>'
+	) );
+}
+
+function bpdw_enqueue_styles() {
+	if ( bpdw_is_wiki_home() ) {
+		wp_enqueue_style( 'bp-docs-wiki-home', plugins_url() . '/buddypress-docs-wiki/wiki-home.css' );
+	}
+}
+
+/**
+ * This function is necessary if I want to provide my own sidebar template in
+ * the plugin
+ */
+function bpdw_get_sidebar() {
+	if ( ! $template = locate_template( 'sidebar-bpdw.php' ) ) {
+		$template = dirname(__FILE__) . '/sidebar-bpdw.php';
+	}
+
+	load_template( $template );
+}

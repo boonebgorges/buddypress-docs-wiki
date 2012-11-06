@@ -1,0 +1,14 @@
+.wiki-home-sidebar {
+	overflow: hidden;
+	margin-top: 2em;
+}
+
+#wiki-bottom .wiki-home-sidebar {
+	float: left;
+	width: 48%;
+	margin-right: 4%;
+}
+	#wiki-bottom .wiki-home-sidebar:last-child {
+		margin-right: 0;
+	}
+
