@@ -27,12 +27,14 @@ add_filter( 'bp_docs_pre_query_args',         'bpdw_filter_query_args' );
 add_filter( 'bp_docs_locate_template',        'bpdw_filter_home_template', 10, 2 );
 add_action( 'widgets_init',                   'bpdw_register_sidebars' );
 add_action( 'wp_enqueue_scripts',             'bpdw_enqueue_styles' );
+add_action( 'bp_docs_sidebar_template',	      'bpdw_filter_bp_docs_sidebar' );
 
 // Widgets
 add_action( 'widgets_init',                   'bpdw_widgets_init' );
 
-// Metadata
+// Metadata/taxonomy
 add_action( 'bp_docs_doc_saved',              'bpdw_save_metadata' );
+add_action( 'bp_docs_taxonomy_saved',         'bpdw_mirror_tags' );
 
 // Redirection
 add_action( 'bp_screens',                     'bpdw_maybe_redirect' );
@@ -107,7 +109,11 @@ function bpdw_generate_rewrite_rules( $wp_rewrite ) {
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&' . BP_DOCS_HISTORY_SLUG . '=1' . '&bpdw_is_wiki=1',
 		bpdw_slug() . '/([^/]+)/' . BP_DOCS_DELETE_SLUG . '/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&' . BP_DOCS_HISTORY_SLUG . '=1' . '&bpdw_is_wiki=1',
-		bpdw_slug() . '(.+?)(/[0-9]+)?/?$' =>
+		bpdw_slug() . '/browse/?$' =>
+			'index.php?post_type=' . bp_docs_get_post_type_name() . '&bpdw_is_wiki=1',
+		bpdw_slug() . '/browse/page/[0-9]+?/?$' =>
+			'index.php?post_type=' . bp_docs_get_post_type_name() . '&paged=' . $wp_rewrite->preg_index( 1 ) . '&bpdw_is_wiki=1',
+		bpdw_slug() . '/(.+?)(/[0-9]+)?/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&bpdw_is_wiki=1',
 		bpdw_slug() . '/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&bpdw_is_wiki=1&bpdw_is_wiki_home=1',
@@ -119,9 +125,17 @@ function bpdw_generate_rewrite_rules( $wp_rewrite ) {
 
 /**
  * Registers our 'bpdw_is_wiki' taxonomy
+ *
+ * Also registers the shadow bpdw_tag taxonomy, which tracks wiki page tags
+ * for the purpose of wiki-specific tag clouds
  */
 function bpdw_register_taxonomy() {
 	register_taxonomy( 'bpdw_is_wiki', bp_docs_get_post_type_name(), array(
+		'public'    => false,
+		'query_var' => false,
+	) );
+
+	register_taxonomy( 'bpdw_tag', bp_docs_get_post_type_name(), array(
 		'public'    => false,
 		'query_var' => false,
 	) );
@@ -213,6 +227,20 @@ function bpdw_save_metadata( $docs_query ) {
 	bp_docs_update_doc_access( $docs_query->doc_id, 'anyone' );
 }
 
+function bpdw_mirror_tags( $query ) {
+	if ( bpdw_is_wiki_doc( $query->doc_id ) ) {
+		// Separate out the terms
+		$terms = ! empty( $_POST['bp_docs_tag'] ) ? explode( ',', $_POST['bp_docs_tag'] ) : array();
+
+		// Strip whitespace from the terms
+		foreach ( $terms as $key => $term ) {
+			$terms[$key] = trim( $term );
+		}
+
+		wp_set_post_terms( $query->doc_id, $terms, 'bpdw_tag' );
+	}
+}
+
 /**
  * Get the canonical address for a Doc
  */
@@ -239,11 +267,13 @@ function bpdw_canonical_address( $doc_id = false ) {
 function bpdw_maybe_redirect() {
 	if ( bp_docs_is_existing_doc() ) {
 		$canonical = bpdw_canonical_address();
+		$current   = trailingslashit( wp_guess_url() );
 
-		$changed = 0 !== strpos( trailingslashit( wp_guess_url() ), $canonical );
+		$change = 0 !== strpos( $current, $canonical );
 
-		if ( $changed ) {
-			bp_core_redirect( $canonical );
+		if ( $change ) {
+			$redirect_to = str_replace( get_permalink(), $canonical, $current );
+			bp_core_redirect( $redirect_to );
 		}
 	}
 }
@@ -345,9 +375,20 @@ function bpdw_get_sidebar() {
 	load_template( $template );
 }
 
+function bpdw_filter_bp_docs_sidebar( $template ) {
+	if ( bpdw_is_wiki() ) {
+		if ( ! $template = locate_template( 'sidebar-bpdw.php' ) ) {
+			$template = dirname(__FILE__) . '/sidebar-bpdw.php';
+		}
+	}
+
+	return $template;
+}
+
 function bpdw_widgets_init() {
 	register_widget( 'BPDW_Recently_Active_Widget' );
 	register_widget( 'BPDW_Most_Active_Widget' );
+	register_widget( 'BPDW_Tag_Cloud_Widget' );
 }
 
 /**
@@ -503,4 +544,63 @@ class BPDW_Most_Active_Widget extends WP_Widget {
 
 
 }
+
+/**
+ * Wiki tag cloud widget
+ */
+class BPDW_Tag_Cloud_Widget extends WP_Widget {
+	public function __construct() {
+		parent::__construct(
+			'bpdw_tag_cloud',
+			__( '(Wiki) Tag Cloud', 'bp-docs-wiki' ),
+			array(
+				'description' => __( 'The most used tags on your wiki, in cloud format.', 'bp-docs-wiki' )
+			)
+		);
+	}
+
+	function widget( $args, $instance ) {
+		extract($args);
+		$current_taxonomy = 'bpdw_tag';
+
+		if ( !empty($instance['title']) ) {
+			$title = $instance['title'];
+		} else {
+			$title = __( 'Wiki Tags', 'bp-docs-wiki' );
+		}
+		$title = apply_filters('widget_title', $title, $instance, $this->id_base);
+
+		echo $before_widget;
+		if ( $title )
+			echo $before_title . $title . $after_title;
+		echo '<div class="tagcloud">';
+
+		add_filter( 'term_link', array( 'BPDW_Tag_Cloud_Widget', 'filter_term_link' ), 10, 3 );
+		wp_tag_cloud( apply_filters('bpdw_widget_tag_cloud_args', array('taxonomy' => $current_taxonomy) ) );
+		echo "</div>\n";
+		echo $after_widget;
+	}
+
+	function update( $new_instance, $old_instance ) {
+		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
+		$instance['taxonomy'] = stripslashes($new_instance['taxonomy']);
+		return $instance;
+	}
+
+	function form( $instance ) {
+		$current_taxonomy = 'bpdw_tag';
+?>
+	<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
+	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $instance['title'])) {echo esc_attr( $instance['title'] );} ?>" /></p>
+	<?php
+	}
+
+	function filter_term_link( $termlink, $term, $taxonomy ) {
+		if ( 'bpdw_tag' == $taxonomy ) {
+			$termlink = add_query_arg( 'bpd_tag', $term->slug, trailingslashit( home_url( bpdw_slug() ) ) . 'browse/' );
+		}
+		return $termlink;
+	}
+}
+
 
