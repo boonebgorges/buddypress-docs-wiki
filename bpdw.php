@@ -313,6 +313,21 @@ function bpdw_filter_gettext( $translation, $text, $domain ) {
 		case 'Create New Doc':
 			return __( 'Create New Wiki Page', 'bp-docs-wiki' );
 			break;
+		case 'Docs Directory':
+			return __( 'Wiki', 'bp-docs-wiki' );
+			break;
+		case 'You are searching for docs containing the term <em>%s</em>' :
+			return __( 'You are searching for wiki pages containing the term <em>%s</em>', 'bp-docs-wiki' );
+			break;
+		case '<strong><a href="%s" title="View All Docs">View All Docs</a></strong>' :
+			return __( '<strong><a href="%s" title="Remove Filter">Remove Filter</a></strong>', 'bp-docs-wiki' );
+			break;
+		case 'Docs tagged %s' :
+			return __( 'Pages tagged %s', 'bp-docs-wiki' );
+			break;
+		case 'Viewing %1$s-%2$s of %3$s docs' :
+			return __( 'Viewing %1$s-%2$s of %3$s pages', 'bp-docs-wiki' );
+			break;
 	}
 
 	return $translation;
