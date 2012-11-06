@@ -11,11 +11,19 @@
 	<div class="wiki-home" id="content">
 		<div class="padder">
 
-		<h2 class="page-title" id="wiki-title"><?php _e( 'Wiki', 'bp-docs-wiki' ) ?></h2>
+		<h3 class="page-title" id="wiki-title"><?php _e( 'Wiki', 'bp-docs-wiki' ) ?></h3>
 
 		<div id="wiki-header">
-			<?php bp_docs_create_button() ?>
-			Search
+			<div class="doc-search" id="wiki-header-search">
+				<form action="<?php echo home_url( 'wiki/browse/' ) ?>" method="get">
+					<input name="s" value="<?php the_search_query() ?>">
+					<input type="submit" value="<?php _e( 'Search', 'bp-docs' ) ?>" />
+				</form>
+			</div>
+
+			<div id="wiki-header-create">
+				<?php bp_docs_create_button() ?>
+			</div>
 		</div>
 
 		<div class="wiki-home-sidebar" id="wiki-top">

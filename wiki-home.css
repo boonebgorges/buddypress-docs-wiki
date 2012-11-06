@@ -12,7 +12,24 @@
 		margin-right: 0;
 	}
 
-/* WIDGETS */
+#wiki-header > div {
+	float: left;
+	width: 48%;
+	margin-right: 4%;
+	text-align: left;
+}
+	#wiki-header > div:last-child {
+		margin-right: 0;
+		text-align: right;
+	}
+
+#wiki-header {
+	overflow: hidden;
+}
+
+.wiki-home .doc-search {
+	float: left;
+}
 
 /* WIDGETS */
 .wiki-home li.odd,
