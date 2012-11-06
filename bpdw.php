@@ -36,6 +36,7 @@ add_action( 'bp_docs_doc_saved',              'bpdw_save_metadata' );
 
 // Redirection
 add_action( 'bp_screens',                     'bpdw_maybe_redirect' );
+add_filter( 'bp_docs_get_doc_link',           'bpdw_filter_doc_link', 10, 2 );
 
 // Translations
 add_filter( 'gettext',                        'bpdw_filter_gettext', 10, 3 );
@@ -213,24 +214,45 @@ function bpdw_save_metadata( $docs_query ) {
 }
 
 /**
+ * Get the canonical address for a Doc
+ */
+function bpdw_canonical_address( $doc_id = false ) {
+	if ( ! $doc_id && bp_docs_is_existing_doc() ) {
+		$doc_id = get_the_ID();
+	}
+
+	$is_wiki_doc = bpdw_is_wiki_doc( get_the_ID() );
+
+	if ( $is_wiki_doc ) {
+		$url = str_replace( home_url( bp_docs_get_slug() ), home_url( bpdw_slug() ), get_permalink( $doc_id ) );
+	} else {
+		$url = str_replace( home_url( bpdw_slug() ), home_url( bp_docs_get_slug() ), get_permalink( $doc_id ) );
+	}
+
+	return $url;
+}
+
+/**
  * When loading a doc, make sure you're viewing it under the correct top-level
  * url (docs or wiki). Redirect if necessary
  */
 function bpdw_maybe_redirect() {
 	if ( bp_docs_is_existing_doc() ) {
-		$is_wiki_url = bpdw_is_wiki();
-		$is_wiki_doc = bpdw_is_wiki_doc( get_the_ID() );
+		$canonical = bpdw_canonical_address();
 
-		if ( $is_wiki_url && ! $is_wiki_doc ) {
-			$redirect_to = str_replace( home_url( bpdw_slug() ), home_url( bp_docs_get_slug() ), wp_guess_url() );
-		} else if ( ! $is_wiki_url && $is_wiki_doc ) {
-			$redirect_to = str_replace( home_url( bp_docs_get_slug() ), home_url( bpdw_slug() ), wp_guess_url() );
-		}
+		$changed = 0 !== strpos( trailingslashit( wp_guess_url() ), $canonical );
 
-		if ( isset( $redirect_to ) ) {
-			bp_core_redirect( $redirect_to );
+		if ( $changed ) {
+			bp_core_redirect( $canonical );
 		}
 	}
+}
+
+/**
+ * Filter doc links to make sure the're canonical
+ */
+function bpdw_filter_doc_link( $link, $doc_id ) {
+	return bpdw_canonical_address( $doc_id );
 }
 
 /**
