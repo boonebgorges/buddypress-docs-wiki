@@ -46,7 +46,7 @@ add_filter( 'gettext',                        'bpdw_filter_gettext', 10, 3 );
 // Page title, class, nav menu
 add_filter( 'body_class',                     'bpdw_filter_body_class' );
 add_filter( 'wp_title',                       'bpdw_filter_page_title' );
-add_filter( 'nav_menu_css_class',             'bpdw_filter_current_nav_menu', 10, 3 );
+add_filter( 'nav_menu_css_class',             'bpdw_filter_current_nav_menu', 10, 2 );
 add_filter( 'bp_docs_allow_comment_section',  'bpdw_allow_comment_section' );
 
 /**
@@ -450,7 +450,7 @@ function bpdw_allow_comment_section( $allow ) {
 	return $allow;
 }
 
-function bpdw_filter_current_nav_menu( $classes, $item, $args ) {
+function bpdw_filter_current_nav_menu( $classes, $item ) {
 	if ( bpdw_is_wiki() ) {
 		if ( bpdw_slug() == $item->post_name ) {
 			$classes[] = 'current-menu-item';
