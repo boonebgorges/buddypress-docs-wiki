@@ -250,8 +250,10 @@ function bpdw_mirror_tags( $query ) {
  * Get the canonical address for a Doc
  */
 function bpdw_canonical_address( $doc_id = false ) {
+	global $wp_query;
+
 	if ( ! $doc_id && bp_docs_is_existing_doc() ) {
-		$doc_id = get_the_ID();
+		$doc_id = $wp_query->post->ID;
 	}
 
 	$is_wiki_doc = bpdw_is_wiki_doc( $doc_id );
@@ -270,14 +272,15 @@ function bpdw_canonical_address( $doc_id = false ) {
  * url (docs or wiki). Redirect if necessary
  */
 function bpdw_maybe_redirect() {
+	global $wp_query;
+
 	if ( bp_docs_is_existing_doc() ) {
 		$canonical = bpdw_canonical_address();
 		$current   = trailingslashit( wp_guess_url() );
-
 		$change = 0 !== strpos( $current, $canonical );
 
 		if ( $change ) {
-			$redirect_to = str_replace( get_permalink(), $canonical, $current );
+			$redirect_to = str_replace( get_permalink( $wp_query->post->ID), $canonical, $current );
 			bp_core_redirect( $redirect_to );
 		}
 	}
