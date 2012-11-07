@@ -452,7 +452,7 @@ function bpdw_allow_comment_section( $allow ) {
 
 function bpdw_filter_current_nav_menu( $classes, $item ) {
 	if ( bpdw_is_wiki() ) {
-		if ( bpdw_slug() == $item->post_name ) {
+		if ( home_url( bpdw_slug() ) == $item->url ) {
 			$classes[] = 'current-menu-item';
 		} else {
 			$key = array_search( 'current-menu-item', $classes );
