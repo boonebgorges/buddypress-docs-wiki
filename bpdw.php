@@ -290,7 +290,7 @@ function bpdw_maybe_redirect() {
  * Filter doc links to make sure the're canonical
  */
 function bpdw_filter_doc_link( $link, $doc_id ) {
-	return bpdw_canonical_address( $doc_id );
+	return trailingslashit( bpdw_canonical_address( $doc_id ) );
 }
 
 function bpdw_filter_archive_link( $link ) {
