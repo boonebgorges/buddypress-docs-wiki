@@ -1,6 +1,6 @@
 === BuddyPress Docs Wiki add-on ===
 Contributors: boonebgorges, cuny-academic-commons
-Stable tag: 1.0
+Stable tag: 1.0.1
 
 == Changelog ==
 
