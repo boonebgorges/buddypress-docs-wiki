@@ -1,11 +1,4 @@
 <?php
-/*
-Plugin name: BuddyPress Docs Wiki add-on
-Author: Boone B Gorges
-License: GPLv3
-Version: 1.0.1
-*/
-
 /**
  * Todo:
  * - Nav menu, esp current state
