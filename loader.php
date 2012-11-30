@@ -4,7 +4,8 @@ Plugin Name: BuddyPress Docs Wiki add-on
 Description: Add a separate Wiki section to your site. Powered by BuddyPress Docs
 Author: Boone B Gorges
 Author URI: http://boone.gorg.es
-Version: 1.0
+License: GPLv3
+Version: 1.0.1
 */
 
 function bpdw_init() {
