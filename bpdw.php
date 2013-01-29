@@ -40,6 +40,7 @@ add_filter( 'bp_docs_get_doc_link',           'bpdw_filter_doc_link', 10, 2 );
 add_filter( 'bp_docs_get_archive_link',       'bpdw_filter_archive_link' );
 
 // Translations
+add_action( 'init',                           'bpdw_localization',   0 );
 add_filter( 'gettext',                        'bpdw_filter_gettext', 10, 3 );
 
 // Page title, class, nav menu
@@ -348,6 +349,40 @@ function bpdw_filter_gettext( $translation, $text, $domain ) {
 	}
 
 	return $translation;
+}
+
+/**
+ * Custom textdomain loader.
+ *
+ * Checks WP_LANG_DIR for the .mo file first, then the plugin's language folder.
+ * Allows for a custom language file other than those packaged with the plugin.
+ *
+ * @since 1.0.3
+ *
+ * @uses get_locale() To get the current locale
+ * @uses load_textdomain() Loads a .mo file into WP
+ * @return bool True on success, false on failure
+ */
+function bpdw_localization() {
+	// Use the WP plugin locale filter from load_plugin_textdomain()
+	$locale        = apply_filters( 'plugin_locale', get_locale(), 'bp-docs-wiki' );
+	$mofile        = sprintf( '%1$s-%2$s.mo', 'bp-docs-wiki', $locale );
+
+	$mofile_global = trailingslashit( constant( 'WP_LANG_DIR' ) ) . $mofile;
+	$mofile_local  = trailingslashit( dirname( __FILE__ ) ) . 'languages/' . $mofile;
+
+	// look in /wp-content/languages/ first
+	if ( is_readable( $mofile_global ) ) {
+		return load_textdomain( 'bp-docs-wiki', $mofile_global );
+
+	// if that doesn't exist, check for bundled language file
+	} elseif ( is_readable( $mofile_local ) ) {
+		return load_textdomain( 'bp-docs-wiki', $mofile_local );
+
+	// no language file exists
+	} else {
+		return false;
+	}
 }
 
 function bpdw_register_sidebars() {
