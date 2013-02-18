@@ -4,6 +4,9 @@ Stable tag: 1.0.2
 
 == Changelog ==
 
+= 1.0.3 =
+* Adds localization support
+
 = 1.0.2 =
 * Removes duplicate plugin headers
 
