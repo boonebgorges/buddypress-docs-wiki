@@ -21,11 +21,13 @@ add_filter( 'bp_docs_allow_access_settings',  'bpdw_allow_access_settings' );
 
 // Directories
 add_filter( 'bp_docs_pre_query_args',         'bpdw_filter_query_args' );
-add_filter( 'bp_docs_locate_template',        'bpdw_filter_home_template', 10, 2 );
 add_action( 'widgets_init',                   'bpdw_register_sidebars' );
 add_action( 'wp_enqueue_scripts',             'bpdw_enqueue_styles' );
 add_action( 'bp_docs_sidebar_template',	      'bpdw_filter_bp_docs_sidebar' );
-add_action( 'bp_screens',                     'bpdw_remove_group_column', 5 );
+add_action( 'bp_screens',                     'bpdw_remove_group_column',     5 );
+add_action( 'bp_screens',                     'bpdw_register_template_stack' );
+add_filter( 'bp_get_root_template',           'bpdw_wiki_bypass_theme_compat_template' );
+add_filter( 'bp_get_template_part',           'bpdw_wiki_home_template_part', 10, 2 );
 
 // Widgets
 add_action( 'widgets_init',                   'bpdw_widgets_init' );
@@ -192,20 +194,96 @@ function bpdw_filter_query_args( $args ) {
 	return $args;
 }
 
-function bpdw_filter_home_template( $template_path, $template ) {
-	if ( bpdw_is_wiki_home() && 'archive-bp_doc.php' == $template ) {
-		$child  = get_stylesheet_directory();
-		$parent = get_template_directory();
-
-		if ( file_exists( trailingslashit( $child ) . 'docs/wiki-home.php' ) ) {
-			$template_path = trailingslashit( $child ) . 'docs/wiki-home.php';
-		} else if ( file_exists( trailingslashit( $parent ) . 'docs/wiki-home.php' ) ) {
-			$template_path = trailingslashit( $parent ) . 'docs/wiki-home.php';
-		} else {
-			$template_path = trailingslashit( dirname(__FILE__) ) . 'wiki-home.php';
-		}
+/**
+ * Bypass BP Theme Compat's 'the_content' injection for the wiki homepage
+ * template and use another template as the top-level template.
+ *
+ * Will try to find the 'docs/index-wiki.php' template in the parent or child
+ * theme.  If this template is found in the theme, it will be used.  If no
+ * template is found in the theme, BP Docs Wiki will fallback to theme compat.
+ *
+ * The majority of theme devs will not need to use this template.  This
+ * should only be used in specific cases.
+ *
+ * Hooked to 'bp_get_root_template' as that prevents 'the_content' injection.
+ *
+ * @since 1.0.4
+ *
+ * @return mixed Absolute path to root template on success; boolean false on failure.
+ */
+function bpdw_wiki_bypass_theme_compat_template( $template ) {
+	if ( ! bpdw_is_wiki_home() ) {
+		return $template;
 	}
-	return $template_path;
+
+	return bp_locate_template( 'docs/index-wiki.php', false, false );
+}
+
+/**
+ * Register our custom template directory with BP's template stack.
+ *
+ * This is so we can provide fallback templates from our plugin directory if
+ * the current theme did not override the template in question.
+ *
+ * @since 1.0.4
+ */
+function bpdw_register_template_stack() {
+	if ( bpdw_is_wiki_home() ) {
+		bp_register_template_stack( 'bpdw_get_template_directory', 14 );
+	}
+}
+
+/**
+ * Returns our plugin's directory where custom templates are located.
+ *
+ * @since 1.0.4
+ *
+ * @return string
+ */
+function bpdw_get_template_directory() {
+	return trailingslashit( dirname(__FILE__) ) . 'templates';
+}
+
+
+/**
+ * By default, the wiki home template part uses the BP Docs directory
+ * template part - 'docs/docs-loop.php'
+ *
+ * We want to change this to use a custom template part - 'docs/home-wiki.php'
+ *
+ * @since 1.0.4
+ */
+function bpdw_wiki_home_template_part( $templates, $slug ) {
+	// check if we're on our wiki homepage
+	if ( ! bpdw_is_wiki_home() ) {
+		return $templates;
+	}
+
+	// if the current theme supports 'buddypress', we want to be able to use
+	// the docs-loop template immediately
+	if ( current_theme_supports( 'buddypress' ) || $slug != 'docs/docs-loop' ) {
+		return $templates;
+	}
+
+	// after we've told BP to use our custom wiki homepage template part, we want
+	// to be able to run the docs-loop.php template for real.
+	//
+	// to do this, we check our special marker to see if we've already run this
+	// function before.  if so, we can run the docs-loop.php template.
+	if ( ! empty( buddypress()->wikihome->runonce ) ) {
+		return $templates;
+	}
+
+	// add a marker to see if we've run this function before
+	if ( empty( buddypress()->wikihome ) ) {
+		buddypress()->wikihome = new stdClass;
+		buddypress()->wikihome->runonce = 1;
+	}
+
+	// return our custom wiki homepage template part
+	return array(
+		'docs/home-wiki.php'
+	);
 }
 
 /**
@@ -416,15 +494,17 @@ function bpdw_register_sidebars() {
 		'after_title'   => '</h3>'
 	) );
 
-	register_sidebar( array(
-		'name'          => __( 'Wiki Sidebar', 'bp-docs-wiki' ),
-		'id'            => 'wiki-sidebar',
-		'description'   => __( 'The sidebar on the Wiki home page', 'bp-docs-wiki' ),
-		'before_widget' => '<div id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</div>',
-		'before_title'  => '<h3>',
-		'after_title'   => '</h3>'
-	) );
+	if ( current_theme_supports( 'buddypress' ) ) {
+		register_sidebar( array(
+			'name'          => __( 'Wiki Sidebar', 'bp-docs-wiki' ),
+			'id'            => 'wiki-sidebar',
+			'description'   => __( 'The sidebar on the Wiki home page', 'bp-docs-wiki' ),
+			'before_widget' => '<div id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</div>',
+			'before_title'  => '<h3>',
+			'after_title'   => '</h3>'
+		) );
+	}
 }
 
 function bpdw_enqueue_styles() {
