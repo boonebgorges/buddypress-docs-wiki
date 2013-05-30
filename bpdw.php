@@ -321,7 +321,7 @@ function bpdw_filter_title( $retval ) {
 	switch( $retval ) {
 		case __( 'Docs Directory', 'buddypress' ) :
 			return __( 'Wiki', 'bpdw' );
-			
+
 			break;
 
 		default :
