@@ -220,16 +220,20 @@ function bpdw_wiki_bypass_theme_compat_template( $template ) {
 }
 
 /**
- * Register our custom template directory with BP's template stack.
+ * Register our custom template directories with BP's template stack.
  *
  * This is so we can provide fallback templates from our plugin directory if
  * the current theme did not override the template in question.
+ *
+ * We also register BP Docs' template directory on the chance that we might
+ * want to use one of its templates like /docs/docs-loop.php.
  *
  * @since 1.0.4
  */
 function bpdw_register_template_stack() {
 	if ( bpdw_is_wiki_home() ) {
-		bp_register_template_stack( 'bpdw_get_template_directory', 14 );
+		bp_register_template_stack( 'bpdw_get_template_directory',      14 );
+		bp_register_template_stack( 'bpdw_docs_get_template_directory', 14 );
 	}
 }
 
@@ -244,6 +248,16 @@ function bpdw_get_template_directory() {
 	return trailingslashit( dirname(__FILE__) ) . 'templates';
 }
 
+/**
+ * Returns BP Docs' plugin template directory.
+ *
+ * @since 1.0.4
+ *
+ * @return string
+ */
+function bpdw_docs_get_template_directory() {
+	return BP_DOCS_INCLUDES_PATH . '/templates';
+}
 
 /**
  * By default, the wiki home template part uses the BP Docs directory
