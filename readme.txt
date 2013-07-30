@@ -1,8 +1,11 @@
 === BuddyPress Docs Wiki add-on ===
 Contributors: boonebgorges, cuny-academic-commons
-Stable tag: 1.0.2
+Stable tag: 1.0.4
 
 == Changelog ==
+
+= 1.0.4 =
+* Better theme compatibility with WordPress themes.
 
 = 1.0.3 =
 * Adds localization support
