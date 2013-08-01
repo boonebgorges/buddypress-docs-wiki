@@ -680,8 +680,10 @@ class BPDW_Recently_Active_Widget extends WP_Widget {
 		   . $instance['title']
 		   . $after_title;
 
+		$max_pages = isset( $instance['max_pages'] ) ? (int) $instance['max_pages'] : 5;
+
 		$docs_args = array(
-			'posts_per_page' => $instance['max_pages'],
+			'posts_per_page' => $max_pages,
 			'orderby' => 'modified',
 		);
 
@@ -757,8 +759,10 @@ class BPDW_Most_Active_Widget extends WP_Widget {
 		   . $instance['title']
 		   . $after_title;
 
+		$max_pages = isset( $instance['max_pages'] ) ? (int) $instance['max_pages'] : 5;
+
 		$docs_args = array(
-			'posts_per_page' => $instance['max_pages'],
+			'posts_per_page' => $max_pages,
 			'orderby' => 'most_active',
 		);
 
