@@ -19,6 +19,9 @@ add_action( 'bp_docs_init',                   'bpdw_register_taxonomy' );
 add_filter( 'bp_docs_allow_associated_group', 'bpdw_allow_associated_group' );
 add_filter( 'bp_docs_allow_access_settings',  'bpdw_allow_access_settings' );
 
+// Permissions
+add_filter( 'bp_docs_attachment_upload_is_doc', 'bpdw_attachment_upload_is_doc', 10, 2 );
+
 // Directories
 add_filter( 'bp_docs_pre_query_args',         'bpdw_filter_query_args' );
 add_action( 'widgets_init',                   'bpdw_register_sidebars' );
