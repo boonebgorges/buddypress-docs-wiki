@@ -171,6 +171,26 @@ function bpdw_allow_access_settings( $allow ) {
 }
 
 /**
+ * Ensures that Wiki Create page registers as a Doc during attachment upload
+ *
+ * BuddyPress Docs does a trick to enable the upload_files cap for non-admin
+ * users; see BP_Docs_Attachments::map_meta_cap(). Part of this trick requires
+ * determining whether the HTTP_REFERER is the Docs create page. But this check
+ * fails when BPDW has swapped out the 'docs' slug for the 'wiki' slug. In this
+ * function, we manually filter the result of the "is_doc" check, and use our
+ * own logic for checking the HTTP_REFERER.
+ *
+ * @since 1.0.5
+ */
+function bpdw_attachment_upload_is_doc( $is_doc, $is_ajax ) {
+	if ( $is_ajax ) {
+		$is_doc = $_SERVER['HTTP_REFERER'] === trailingslashit( home_url( bpdw_slug() ) ) . 'create/';
+	}
+
+	return $is_doc;
+}
+
+/**
  * Make sure that only wiki pages appear on wiki directories, and that no
  * wiki pages appear on non-wiki directories
  */
@@ -921,8 +941,5 @@ class BPDW_My_Pages_Widget extends WP_Widget {
 
 		echo $after_widget;
 	}
-
-
 }
-
 

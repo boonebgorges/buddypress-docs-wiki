@@ -4,6 +4,9 @@ Stable tag: 1.0.4
 
 == Changelog ==
 
+= 1.0.5 =
+* Fix bug with file uploads for non-admin
+
 = 1.0.4 =
 * Better theme compatibility with WordPress themes.
 
