@@ -422,7 +422,7 @@ function bpdw_maybe_redirect() {
 
 	if ( bp_docs_is_existing_doc() ) {
 		$canonical = bpdw_canonical_address();
-		$current   = trailingslashit( wp_guess_url() );
+		$current   = set_url_scheme( trailingslashit( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
 		$change = 0 !== strpos( $current, $canonical );
 
 		if ( $change ) {
