@@ -25,7 +25,7 @@ add_action( 'widgets_init',                   'bpdw_register_sidebars' );
 add_action( 'wp_enqueue_scripts',             'bpdw_enqueue_styles' );
 add_action( 'bp_docs_sidebar_template',	      'bpdw_filter_bp_docs_sidebar' );
 add_action( 'bp_screens',                     'bpdw_remove_group_column',     5 );
-add_action( 'bp_screens',                     'bpdw_register_template_stack' );
+add_action( 'bp_screens',                     'bpdw_screen' );
 add_filter( 'bp_get_root_template',           'bpdw_wiki_bypass_theme_compat_template' );
 add_filter( 'bp_get_template_part',           'bpdw_wiki_home_template_part', 10, 2 );
 
@@ -220,16 +220,30 @@ function bpdw_wiki_bypass_theme_compat_template( $template ) {
 }
 
 /**
- * Register our custom template directory with BP's template stack.
+ * Do some stuff while on the wiki homepage screen.
+ *
+ * 1) Register our custom template directories with BP's template stack.
+ *
+ * We register BP Docs' template directory on the chance that we might
+ * want to use one of its templates like /docs/docs-loop.php.
  *
  * This is so we can provide fallback templates from our plugin directory if
  * the current theme did not override the template in question.
  *
+ * 2) Filter the_title.
+ *
+ * Title uses 'Docs Directory' by default.  Change context to 'Wiki'.
+ *
  * @since 1.0.4
  */
-function bpdw_register_template_stack() {
+function bpdw_screen() {
 	if ( bpdw_is_wiki_home() ) {
-		bp_register_template_stack( 'bpdw_get_template_directory', 14 );
+		// Register custom template directories
+		bp_register_template_stack( 'bpdw_get_template_directory',      14 );
+		bp_register_template_stack( 'bpdw_docs_get_template_directory', 14 );
+
+		// Also filter the title while we're here
+		add_filter( 'the_title', 'bpdw_filter_title' );
 	}
 }
 
@@ -244,6 +258,16 @@ function bpdw_get_template_directory() {
 	return trailingslashit( dirname(__FILE__) ) . 'templates';
 }
 
+/**
+ * Returns BP Docs' plugin template directory.
+ *
+ * @since 1.0.4
+ *
+ * @return string
+ */
+function bpdw_docs_get_template_directory() {
+	return BP_DOCS_INCLUDES_PATH . '/templates';
+}
 
 /**
  * By default, the wiki home template part uses the BP Docs directory
@@ -284,6 +308,27 @@ function bpdw_wiki_home_template_part( $templates, $slug ) {
 	return array(
 		'docs/home-wiki.php'
 	);
+}
+
+/**
+ * Filter the_title on the wiki homepage.
+ *
+ * @since 1.0.4
+ *
+ * @return string
+ */
+function bpdw_filter_title( $retval ) {
+	switch( $retval ) {
+		case __( 'Docs Directory', 'buddypress' ) :
+			return __( 'Wiki', 'bpdw' );
+
+			break;
+
+		default :
+			return $retval;
+
+			break;
+	}
 }
 
 /**

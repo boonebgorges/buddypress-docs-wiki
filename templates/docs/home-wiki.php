@@ -4,8 +4,6 @@
  */
 ?>
 
-<div id="buddypress">
-
 	<div class="wiki-home">
 		<div class="wiki-home-sidebar" id="wiki-top">
 			<?php dynamic_sidebar( 'wiki-top' ) ?>
@@ -25,5 +23,3 @@
 		<?php bp_get_template_part( 'docs/docs-loop' ); ?>
 
 	</div><!-- .wiki-home -->
-
-</div>
