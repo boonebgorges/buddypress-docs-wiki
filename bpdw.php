@@ -199,22 +199,46 @@ function bpdw_attachment_upload_is_doc( $is_doc, $is_ajax ) {
  */
 function bpdw_filter_query_args( $args ) {
 	if ( bpdw_is_wiki() ) {
-		$args['tax_query'][] = array(
-			'taxonomy' => 'bpdw_is_wiki',
-			'terms'    => '1',
-			'operator' => 'IN',
-			'field'    => 'name',
-		);
+		$args['tax_query'][] = bpdw_tax_query_iswiki();
 	} else {
-		$args['tax_query'][] = array(
-			'taxonomy' => 'bpdw_is_wiki',
-			'terms'    => '1',
-			'operator' => 'NOT IN',
-			'field'    => 'name',
-		);
+		$args['tax_query'][] = bpdw_tax_query_isnotwiki();
 	}
 
 	return $args;
+}
+
+/**
+ * Add the iswiki tax_query arg to a set of query args
+ */
+function bpdw_tax_query_iswiki_cb( $args ) {
+	$args['tax_query'][] = bpdw_tax_query_iswiki();
+	return $args;
+}
+
+/**
+ * Add the isnotwiki tax_query arg to a set of query args
+ */
+function bpdw_tax_query_isnotwiki_cb( $args ) {
+	$args['tax_query'][] = bpdw_tax_query_isnotwiki();
+	return $args;
+}
+
+function bpdw_tax_query_iswiki() {
+	return array(
+		'taxonomy' => 'bpdw_is_wiki',
+		'terms'    => '1',
+		'operator' => 'IN',
+		'field'    => 'name',
+	);
+}
+
+function bpdw_tax_query_isnotwiki() {
+	return array(
+		'taxonomy' => 'bpdw_is_wiki',
+		'terms'    => '1',
+		'operator' => 'NOT IN',
+		'field'    => 'name',
+	);
 }
 
 /**
@@ -784,6 +808,10 @@ class BPDW_Most_Active_Widget extends WP_Widget {
 
 		$max_pages = isset( $instance['max_pages'] ) ? (int) $instance['max_pages'] : 5;
 
+		// Remove auto-filters, and ensure we only pull up wiki docs
+		remove_filter( 'bp_docs_pre_query_args', 'bpdw_filter_query_args' );
+		add_filter( 'bp_docs_pre_query_args', 'bpdw_tax_query_iswiki_cb' );
+
 		$docs_args = array(
 			'posts_per_page' => $max_pages,
 			'orderby' => 'most_active',
@@ -806,6 +834,10 @@ class BPDW_Most_Active_Widget extends WP_Widget {
 			}
 			echo '</ul>';
 		}
+
+		// Cleanup
+		add_filter( 'bp_docs_pre_query_args', 'bpdw_filter_query_args' );
+		remove_filter( 'bp_docs_pre_query_args', 'bpdw_tax_query_iswiki_cb' );
 
 		echo $after_widget;
 	}
@@ -924,6 +956,10 @@ class BPDW_My_Pages_Widget extends WP_Widget {
 			'orderby' => 'most_active',
 		);
 
+		// Remove auto-filters, and ensure we only pull up wiki docs
+		remove_filter( 'bp_docs_pre_query_args', 'bpdw_filter_query_args' );
+		add_filter( 'bp_docs_pre_query_args', 'bpdw_tax_query_iswiki_cb' );
+
 		$counter = 2; // Start with a weird number so as not to break the modulo
 		bp_docs_reset_query();
 		if ( bp_docs_has_docs( $docs_args ) ) {
@@ -941,6 +977,10 @@ class BPDW_My_Pages_Widget extends WP_Widget {
 			}
 			echo '</ul>';
 		}
+
+		// Cleanup
+		add_filter( 'bp_docs_pre_query_args', 'bpdw_filter_query_args' );
+		remove_filter( 'bp_docs_pre_query_args', 'bpdw_tax_query_iswiki_cb' );
 
 		echo $after_widget;
 	}
