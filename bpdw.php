@@ -734,6 +734,10 @@ class BPDW_Recently_Active_Widget extends WP_Widget {
 			'orderby' => 'modified',
 		);
 
+		// Remove auto-filters, and ensure we only pull up wiki docs
+		remove_filter( 'bp_docs_pre_query_args', 'bpdw_filter_query_args' );
+		add_filter( 'bp_docs_pre_query_args', 'bpdw_tax_query_iswiki_cb' );
+
 		$counter = 2; // Start with a weird number so as not to break the modulo
 		bp_docs_reset_query();
 		if ( bp_docs_has_docs( $docs_args ) ) {
@@ -751,6 +755,10 @@ class BPDW_Recently_Active_Widget extends WP_Widget {
 			}
 			echo '</ul>';
 		}
+
+		// Cleanup
+		add_filter( 'bp_docs_pre_query_args', 'bpdw_filter_query_args' );
+		remove_filter( 'bp_docs_pre_query_args', 'bpdw_tax_query_iswiki_cb' );
 
 		echo $after_widget;
 	}
