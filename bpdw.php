@@ -14,6 +14,7 @@ add_filter( 'generate_rewrite_rules',         'bpdw_generate_rewrite_rules' );
 
 // Taxonomy
 add_action( 'bp_docs_init',                   'bpdw_register_taxonomy' );
+add_filter( 'bp_docs_taxonomy_get_item_terms', 'bpdw_get_item_terms', 5 );
 
 // Create/edit interface
 add_filter( 'bp_docs_allow_associated_group', 'bpdw_allow_associated_group' );
@@ -149,6 +150,47 @@ function bpdw_register_taxonomy() {
 		'public'    => false,
 		'query_var' => false,
 	) );
+}
+
+/**
+ * Filter the terms available when looking at a Docs or Wiki directory
+ */
+function bpdw_get_item_terms( $terms ) {
+	// Get all doc ids
+	$item_ids = bp_docs_get_doc_ids_accessible_to_current_user();
+
+	// But then filter according to wiki status
+	$wiki_items = get_posts( array(
+		'post_type' => bp_docs_get_post_type_name(),
+		'tax_query' => array( bpdw_tax_query_iswiki() ),
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'nopaging' => true,
+		'posts_per_page' => -1,
+	) );
+	$wiki_item_ids = wp_list_pluck( $wiki_items, 'ID' );
+
+	if ( bpdw_is_wiki() ) {
+		$item_ids = array_intersect( $item_ids, $wiki_item_ids );
+	} else {
+		$item_ids = array_diff( $item_ids, $wiki_item_ids );
+	}
+
+	// Pass to wp_get_object_terms()
+	$terms = wp_get_object_terms( $item_ids, array( buddypress()->bp_docs->docs_tag_tax_name ) );
+
+	// Reformat
+	$terms_array = array();
+	foreach ( $terms as $t ) {
+		$terms_array[ $t->slug ] = $t->count;
+	}
+
+	unset( $items, $terms );
+
+	// Don't allow BP Docs to do its native directory filtering
+	remove_action( 'bp_docs_taxonomy_get_item_terms', array( buddypress()->bp_docs, 'get_item_terms' ) );
+
+	return $terms_array;
 }
 
 /**
