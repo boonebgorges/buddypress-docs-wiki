@@ -1,8 +1,18 @@
 === BuddyPress Docs Wiki add-on ===
 Contributors: boonebgorges, cuny-academic-commons
-Stable tag: 1.0.3
+Stable tag: 1.0.5
 
 == Changelog ==
+
+= 1.0.6 =
+* Fix bug in the way directory Tag filters are built
+
+= 1.0.5 =
+* Fix bug with file uploads for non-admin
+* Fix bug when calculating canonical redirects
+
+= 1.0.4 =
+* Better theme compatibility with WordPress themes.
 
 = 1.0.3 =
 * Adds localization support
