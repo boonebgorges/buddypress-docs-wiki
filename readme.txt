@@ -6,6 +6,7 @@ Stable tag: 1.0.5
 
 = 1.0.6 =
 * Fix bug in the way directory Tag filters are built
+* Improve widget styling
 
 = 1.0.5 =
 * Fix bug with file uploads for non-admin
