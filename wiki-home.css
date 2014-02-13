@@ -40,3 +40,8 @@ body.wiki div#subnav.item-list-tabs li {
 	list-style-type: none;
 	padding-left: 0
 }
+
+.widget_bpdw_most_active ul,
+.widget_bpdw_recently_active ul {
+	padding-left: 0;
+}
