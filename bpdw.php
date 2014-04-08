@@ -182,7 +182,10 @@ function bpdw_get_item_terms( $terms ) {
 	// Reformat
 	$terms_array = array();
 	foreach ( $terms as $t ) {
-		$terms_array[ $t->slug ] = $t->count;
+		$terms_array[ $t->slug ] = array(
+			'name' => $t->name,
+			'count' => $t->count,
+		);
 	}
 
 	unset( $items, $terms );
