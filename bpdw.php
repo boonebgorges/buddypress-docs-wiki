@@ -164,7 +164,7 @@ function bpdw_get_item_terms( $terms ) {
 		'post_type' => bp_docs_get_post_type_name(),
 		'tax_query' => array( bpdw_tax_query_iswiki() ),
 		'update_post_meta_cache' => false,
-		'update_post_term_cache' => false,
+		'update_post_term_cache' => true,
 		'nopaging' => true,
 		'posts_per_page' => -1,
 	) );
@@ -176,16 +176,26 @@ function bpdw_get_item_terms( $terms ) {
 		$item_ids = array_diff( $item_ids, $wiki_item_ids );
 	}
 
-	// Pass to wp_get_object_terms()
-	$terms = wp_get_object_terms( $item_ids, array( buddypress()->bp_docs->docs_tag_tax_name ) );
+	// Have to do it one at a time so we have accurate wiki/doc-only counts
+	$all_terms = array();
+	foreach ( $item_ids as $item_id ) {
+		$terms = wp_get_object_terms( $item_id, array( buddypress()->bp_docs->docs_tag_tax_name ) );
+		foreach ( $terms as $t ) {
+			if ( ! isset( $all_terms[ $t->slug ] ) ) {
+				$all_terms[ $t->slug ] = array(
+					'name' => $t->name,
+					'posts' => array(),
+				);
+			}
 
-	// Reformat
-	$terms_array = array();
-	foreach ( $terms as $t ) {
-		$terms_array[ $t->slug ] = array(
-			'name' => $t->name,
-			'count' => $t->count,
-		);
+			if ( ! in_array( $item_id, $all_terms[ $t->slug ]['posts'] ) ) {
+				$all_terms[ $t->slug ]['posts'][] = $item_id;
+			}
+		}
+	}
+
+	foreach ( $all_terms as &$at ) {
+		$at['count'] = count( $at['posts'] );
 	}
 
 	unset( $items, $terms );
@@ -193,7 +203,7 @@ function bpdw_get_item_terms( $terms ) {
 	// Don't allow BP Docs to do its native directory filtering
 	remove_action( 'bp_docs_taxonomy_get_item_terms', array( buddypress()->bp_docs, 'get_item_terms' ) );
 
-	return $terms_array;
+	return $all_terms;
 }
 
 /**
