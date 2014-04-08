@@ -4,6 +4,9 @@ Stable tag: 1.0.6
 
 == Changelog ==
 
+= 1.0.7 =
+* Improve tag filter counts and name display
+
 = 1.0.6 =
 * Fix bug in the way directory Tag filters are built
 * Improve widget styling
