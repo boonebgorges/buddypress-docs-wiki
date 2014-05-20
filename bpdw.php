@@ -571,6 +571,9 @@ function bpdw_filter_gettext( $translation, $text, $domain ) {
 		case 'Viewing %1$s-%2$s of %3$s docs' :
 			return __( 'Viewing %1$s-%2$s of %3$s pages', 'bp-docs-wiki' );
 			break;
+		case 'You are viewing <strong>all</strong> docs.' :
+			return __( 'You are viewing <strong>all</strong> wiki pages.', 'bp-docs-wiki' );
+			break;
 	}
 
 	return $translation;
