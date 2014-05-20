@@ -7,6 +7,7 @@ Stable tag: 1.0.6
 = 1.0.7 =
 * More consistent URLs for tag cloud links
 * Improve tag filter counts and name display
+* Better docs vs wiki text for tags widget
 
 = 1.0.6 =
 * Fix bug in the way directory Tag filters are built
