@@ -5,6 +5,7 @@ Stable tag: 1.0.6
 == Changelog ==
 
 = 1.0.7 =
+* More consistent URLs for tag cloud links
 * Improve tag filter counts and name display
 
 = 1.0.6 =
