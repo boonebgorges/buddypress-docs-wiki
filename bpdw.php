@@ -728,6 +728,24 @@ function bpdw_filter_current_nav_menu( $classes, $item ) {
 	return $classes;
 }
 
+function bpdw_filter_term_link( $termlink, $term, $taxonomy ) {
+	if ( 'bpdw_tag' == $taxonomy ) {
+		$termlink = add_query_arg( 'bpd_tag', $term->slug, trailingslashit( home_url( bpdw_slug() ) ) . 'browse/' );
+	}
+	return $termlink;
+}
+add_filter( 'term_link', 'bpdw_filter_term_link', 10, 3 );
+
+function bpdw_filter_term_link_widget( $termlink, $args, $item_docs ) {
+	if ( bpdw_is_wiki() ) {
+		// Bug in Docs filter arguments
+		$tag = is_array( $args ) && isset( $args['tag'] ) ? $args['tag'] : $args;
+		$termlink = add_query_arg( 'bpd_tag', $tag, trailingslashit( home_url( bpdw_slug() ) ) . 'browse/' );
+	}
+	return $termlink;
+}
+add_filter( 'bp_docs_get_tag_link_url', 'bpdw_filter_term_link_widget', 10, 3 );
+
 function bpdw_widgets_init() {
 	register_widget( 'BPDW_Recently_Active_Widget' );
 	register_widget( 'BPDW_Most_Active_Widget' );
@@ -938,7 +956,6 @@ class BPDW_Tag_Cloud_Widget extends WP_Widget {
 			echo $before_title . $title . $after_title;
 		echo '<div class="tagcloud">';
 
-		add_filter( 'term_link', array( 'BPDW_Tag_Cloud_Widget', 'filter_term_link' ), 10, 3 );
 		wp_tag_cloud( apply_filters('bpdw_widget_tag_cloud_args', array('taxonomy' => $current_taxonomy) ) );
 		echo "</div>\n";
 		echo $after_widget;
@@ -956,13 +973,6 @@ class BPDW_Tag_Cloud_Widget extends WP_Widget {
 	<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
 	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $instance['title'])) {echo esc_attr( $instance['title'] );} ?>" /></p>
 	<?php
-	}
-
-	function filter_term_link( $termlink, $term, $taxonomy ) {
-		if ( 'bpdw_tag' == $taxonomy ) {
-			$termlink = add_query_arg( 'bpd_tag', $term->slug, trailingslashit( home_url( bpdw_slug() ) ) . 'browse/' );
-		}
-		return $termlink;
 	}
 }
 
