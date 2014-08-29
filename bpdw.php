@@ -164,7 +164,7 @@ function bpdw_get_item_terms( $terms ) {
 		'post_type' => bp_docs_get_post_type_name(),
 		'tax_query' => array( bpdw_tax_query_iswiki() ),
 		'update_post_meta_cache' => false,
-		'update_post_term_cache' => true,
+		'update_post_term_cache' => false,
 		'nopaging' => true,
 		'posts_per_page' => -1,
 	) );
@@ -178,9 +178,12 @@ function bpdw_get_item_terms( $terms ) {
 
 	// Have to do it one at a time so we have accurate wiki/doc-only counts
 	$all_terms = array();
+	update_post_caches( $wiki_items, bp_docs_get_post_type_name(), true, false );
+
 	foreach ( $item_ids as $item_id ) {
-		$terms = wp_get_object_terms( $item_id, array( buddypress()->bp_docs->docs_tag_tax_name ) );
-		foreach ( $terms as $t ) {
+		// This data should be cached
+		$cached_terms = wp_cache_get( $item_id, 'bp_docs_tag_relationships' );
+		foreach ( $cached_terms as $t ) {
 			if ( ! isset( $all_terms[ $t->slug ] ) ) {
 				$all_terms[ $t->slug ] = array(
 					'name' => $t->name,
@@ -198,7 +201,7 @@ function bpdw_get_item_terms( $terms ) {
 		$at['count'] = count( $at['posts'] );
 	}
 
-	unset( $items, $terms );
+	unset( $items, $cached_terms );
 
 	// Don't allow BP Docs to do its native directory filtering
 	remove_action( 'bp_docs_taxonomy_get_item_terms', array( buddypress()->bp_docs, 'get_item_terms' ) );
