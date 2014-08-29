@@ -82,16 +82,20 @@ function bpdw_is_wiki_home() {
  * Is a given doc a Wiki doc?
  */
 function bpdw_is_wiki_doc( $doc_id ) {
+
+	// This should already have been pulled up
+	$cached_is_wiki_term = wp_cache_get( $doc_id, 'bpdw_is_wiki_relationships' );
+
+	if ( false === $cached_is_wiki_term ) {
+		update_post_caches( $doc_id, bp_docs_get_post_type_name(), true, false );
+		$cached_is_wiki_term = wp_cache_get( $doc_id, 'bpdw_is_wiki_relationships' );
+	}
+
 	$is_wiki_doc = false;
-
-	$terms = wp_get_post_terms( $doc_id, 'bpdw_is_wiki' );
-
-	if ( ! empty( $terms ) ) {
-		foreach ( $terms as $term ) {
-			if ( 1 == $term->name ) {
-				$is_wiki_doc = true;
-				break;
-			}
+	if ( ! empty( $cached_is_wiki_term ) ) {
+		$cached_term = array_pop( $cached_is_wiki_term );
+		if ( 1 == $cached_term->slug ) {
+			$is_wiki_term = true;
 		}
 	}
 
