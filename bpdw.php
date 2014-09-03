@@ -87,7 +87,8 @@ function bpdw_is_wiki_doc( $doc_id ) {
 	$cached_is_wiki_term = wp_cache_get( $doc_id, 'bpdw_is_wiki_relationships' );
 
 	if ( false === $cached_is_wiki_term ) {
-		update_post_caches( $doc_id, bp_docs_get_post_type_name(), true, false );
+		$docs = array( get_post( $doc_id ) );
+		update_post_caches( $docs, bp_docs_get_post_type_name(), true, false );
 		$cached_is_wiki_term = wp_cache_get( $doc_id, 'bpdw_is_wiki_relationships' );
 	}
 
