@@ -188,16 +188,18 @@ function bpdw_get_item_terms( $terms ) {
 	foreach ( $item_ids as $item_id ) {
 		// This data should be cached
 		$cached_terms = wp_cache_get( $item_id, 'bp_docs_tag_relationships' );
-		foreach ( $cached_terms as $t ) {
-			if ( ! isset( $all_terms[ $t->slug ] ) ) {
-				$all_terms[ $t->slug ] = array(
-					'name' => $t->name,
-					'posts' => array(),
-				);
-			}
+		if ( ! empty( $cached_terms ) ) {
+			foreach ( $cached_terms as $t ) {
+				if ( ! isset( $all_terms[ $t->slug ] ) ) {
+					$all_terms[ $t->slug ] = array(
+						'name' => $t->name,
+						'posts' => array(),
+					);
+				}
 
-			if ( ! in_array( $item_id, $all_terms[ $t->slug ]['posts'] ) ) {
-				$all_terms[ $t->slug ]['posts'][] = $item_id;
+				if ( ! in_array( $item_id, $all_terms[ $t->slug ]['posts'] ) ) {
+					$all_terms[ $t->slug ]['posts'][] = $item_id;
+				}
 			}
 		}
 	}
