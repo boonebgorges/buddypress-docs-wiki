@@ -1,0 +1,166 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BP Docs Wiki\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-28 14:50-0800\n"
+"PO-Revision-Date: 2014-11-04 12:09+0100\n"
+"Last-Translator: \n"
+"Language-Team: Simon Roderus\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext;_n;_n_noop;_x;_nx;_nx_noop;_ex;"
+"esc_attr__;esc_attr_e;esc_attr_x;esc_html__;esc_html_e;esc_html_x;_c\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.5.7\n"
+"Language: de_DE\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../bpdw.php:314
+msgid "New Wiki Page"
+msgstr "Neue Wikiseite"
+
+#: ../bpdw.php:317
+msgid ""
+"Tags are words or phrases that help to describe and organize your wiki pages."
+msgstr "Tags helfen die Seiten des Wikis zu beschreiben und zu durchsuchen."
+
+#: ../bpdw.php:320
+msgid "Select a parent for this wiki page."
+msgstr "Wählen Sie eine übergeordnete Seite."
+
+#: ../bpdw.php:323
+msgid ""
+"(Optional) Assigning a parent that a link to the parent will appear at the "
+"bottom of this wiki page, and a link to this page will appear at the bottom "
+"of the parent."
+msgstr ""
+"(Optional) Wählen Sie eine übergeordnete Seite zuweisen wird diese mit der "
+"aktuellen Seite verknüpft."
+
+#: ../bpdw.php:326
+msgid "There are no comments yet."
+msgstr "Noch keine Kommentare."
+
+#: ../bpdw.php:329
+msgid "Create New Wiki Page"
+msgstr "Neue Seite anlegen"
+
+#: ../bpdw.php:332 ../bpdw.php:478 ../wiki-home.php:14
+msgid "Wiki"
+msgstr "Wiki"
+
+#: ../bpdw.php:335
+#, php-format
+msgid "You are viewing wiki pages with the following tags: %s"
+msgstr "Sie betrachten Seiten mit dem tag: %s"
+
+#: ../bpdw.php:338
+#, php-format
+msgid "You are searching for wiki pages containing the term <em>%s</em>"
+msgstr "Sie suchen nach Seiten mit dem Begriff <em>%s</em>"
+
+#: ../bpdw.php:341
+#, php-format
+msgid ""
+"<strong><a href=\"%s\" title=\"Remove Filter\">Remove Filter</a></strong>"
+msgstr ""
+"<strong><a href=\"%s\" title=\"Filer entfernen\">Filter entfernen</a></"
+"strong>"
+
+#: ../bpdw.php:344
+#, php-format
+msgid "Pages tagged %s"
+msgstr "Seiten mit Tag %s"
+
+#: ../bpdw.php:347
+#, php-format
+msgid "Viewing %1$s-%2$s of %3$s pages"
+msgstr "Sie betrachten %1$s-%2$s von %3$s Seiten"
+
+#: ../bpdw.php:390
+msgid "Wiki Top"
+msgstr "Wiki Startseite"
+
+#: ../bpdw.php:392
+msgid "The full-width area at the top of the Wiki home page"
+msgstr "Der obere Bereich auf der Wikistartseite"
+
+#: ../bpdw.php:400
+msgid "Wiki Bottom Left"
+msgstr "Wiki Unten Links"
+
+#: ../bpdw.php:402
+msgid "The half-width area at the bottom-left of the Wiki home page"
+msgstr "Der halbseitige Bereich in der unteren linken Ecke der Wiki Startseite"
+
+#: ../bpdw.php:410
+msgid "Wiki Bottom Right"
+msgstr "Wiki Unten Rechts"
+
+#: ../bpdw.php:412
+msgid "The half-width area at the bottom-right of the Wiki home page"
+msgstr ""
+"Der halbseitige Bereich in der unteren rechten Ecke der Wiki Startseite"
+
+#: ../bpdw.php:420
+msgid "Wiki Sidebar"
+msgstr "Wiki Seitenleiste"
+
+#: ../bpdw.php:422
+msgid "The sidebar on the Wiki home page"
+msgstr "Die Seitenleiste der Wiki Startseite"
+
+#: ../bpdw.php:478
+msgid "BuddyPress Docs"
+msgstr ""
+
+#: ../bpdw.php:517
+msgid "(Wiki) Recently Active Pages"
+msgstr "Kürzlich aktive Seiten"
+
+#: ../bpdw.php:519
+msgid "A list of recently active wiki pages."
+msgstr "Eine Liste kürzlich aktiver Seiten."
+
+#: ../bpdw.php:526
+msgid "Recently Active"
+msgstr "Vor kurzen aktiv"
+
+#: ../bpdw.php:535 ../bpdw.php:612 ../bpdw.php:709 ../bpdw.php:747
+msgid "Title:"
+msgstr "Titel:"
+
+#: ../bpdw.php:536 ../bpdw.php:613 ../bpdw.php:748
+msgid "Number of posts to show:"
+msgstr "Anzahl der zu zeigenden Einträge:"
+
+#: ../bpdw.php:594 ../bpdw.php:729
+msgid "(Wiki) Most Active Pages"
+msgstr "(Wiki) Aktivste Seiten"
+
+#: ../bpdw.php:596 ../bpdw.php:731
+msgid "A list of most active wiki pages."
+msgstr "Eine liste der aktivsten Wikiseiten."
+
+#: ../bpdw.php:603 ../bpdw.php:738
+msgid "Most Active"
+msgstr "Aktivste"
+
+#: ../bpdw.php:671
+msgid "(Wiki) Tag Cloud"
+msgstr ""
+
+#: ../bpdw.php:673
+msgid "The most used tags on your wiki, in cloud format."
+msgstr "Am häufigsten verwendete Wiki-Tags als Tagwolke."
+
+#: ../bpdw.php:685
+msgid "Wiki Tags"
+msgstr ""
+
+#: ../wiki-home.php:20
+msgid "Search"
+msgstr "Suche"
