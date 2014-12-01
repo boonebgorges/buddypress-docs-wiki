@@ -5,7 +5,7 @@ Description: Add a separate Wiki section to your site. Powered by BuddyPress Doc
 Author: Boone B Gorges
 Author URI: http://boone.gorg.es
 License: GPLv3
-Version: 1.0.7
+Version: 1.0.8
 */
 
 function bpdw_init() {
