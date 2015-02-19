@@ -8,6 +8,8 @@ License: GPLv3
 Version: 1.0.8
 */
 
+define( 'BPDW_VERSION', '1.0.9' );
+
 function bpdw_init() {
 	require dirname(__FILE__) . '/bpdw.php';
 }
