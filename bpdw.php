@@ -127,7 +127,7 @@ function bpdw_generate_rewrite_rules( $wp_rewrite ) {
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&' . BP_DOCS_HISTORY_SLUG . '=1' . '&bpdw_is_wiki=1',
 		bpdw_slug() . '/browse/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&bpdw_is_wiki=1',
-		bpdw_slug() . '/browse/page/[0-9]+?/?$' =>
+		bpdw_slug() . '/page/([0-9]+?)/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&paged=' . $wp_rewrite->preg_index( 1 ) . '&bpdw_is_wiki=1',
 		bpdw_slug() . '/(.+?)(/[0-9]+)?/?$' =>
 			'index.php?post_type=' . bp_docs_get_post_type_name() . '&name=' . $wp_rewrite->preg_index( 1 ) . '&bpdw_is_wiki=1',
