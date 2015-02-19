@@ -8,6 +8,9 @@ if ( ! defined( 'BP_DOCS_WIKI_SLUG' ) ) {
 	define( 'BP_DOCS_WIKI_SLUG', 'wiki' );
 }
 
+// Upgrade routines
+add_action( 'admin_init', 'bpdw_upgrade' );
+
 // Rewrites
 add_filter( 'query_vars',                     'bpdw_query_vars' );
 add_filter( 'generate_rewrite_rules',         'bpdw_generate_rewrite_rules' );
@@ -1072,3 +1075,24 @@ class BPDW_My_Pages_Widget extends WP_Widget {
 	}
 }
 
+/** Upgrade routines **********************************************************/
+
+/**
+ * Run necessary upgrade routines.
+ *
+ * @since 1.0.9
+ */
+function bpdw_upgrade() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$old_version = get_option( 'bpdw_version' );
+
+	// 1.0.9.
+	if ( version_compare( $old_version, '1.0.9', '<' ) ) {
+		flush_rewrite_rules();
+	}
+
+	update_option( 'bpdw_version', BPDW_VERSION );
+}
