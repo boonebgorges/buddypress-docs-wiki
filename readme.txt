@@ -1,8 +1,11 @@
 === BuddyPress Docs Wiki add-on ===
 Contributors: boonebgorges, cuny-academic-commons
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 
 == Changelog ==
+
+= 1.0.9 =
+* Fixed some bugs related to pagination rewrites
 
 = 1.0.8 =
 * Improved efficiency when fetching wiki tags
