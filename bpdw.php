@@ -190,7 +190,7 @@ function bpdw_get_item_terms( $terms ) {
 
 	foreach ( $item_ids as $item_id ) {
 		// This data should be cached
-		$cached_terms = wp_cache_get( $item_id, 'bp_docs_tag_relationships' );
+		$cached_terms = get_object_term_cache( $item_id, 'bp_docs_tag' );
 		if ( ! empty( $cached_terms ) ) {
 			foreach ( $cached_terms as $t ) {
 				if ( ! isset( $all_terms[ $t->slug ] ) ) {
