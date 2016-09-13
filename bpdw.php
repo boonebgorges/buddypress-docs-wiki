@@ -87,12 +87,12 @@ function bpdw_is_wiki_home() {
 function bpdw_is_wiki_doc( $doc_id ) {
 
 	// This should already have been pulled up
-	$cached_is_wiki_term = wp_cache_get( $doc_id, 'bpdw_is_wiki_relationships' );
+	$cached_is_wiki_term = get_object_term_cache( $doc_id, 'bpdw_is_wiki' );
 
 	if ( false === $cached_is_wiki_term ) {
 		$docs = array( get_post( $doc_id ) );
 		update_post_caches( $docs, bp_docs_get_post_type_name(), true, false );
-		$cached_is_wiki_term = wp_cache_get( $doc_id, 'bpdw_is_wiki_relationships' );
+		$cached_is_wiki_term = get_object_term_cache( $doc_id, 'bpdw_is_wiki' );
 	}
 
 	$is_wiki_doc = false;
