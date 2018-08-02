@@ -99,7 +99,7 @@ function bpdw_is_wiki_doc( $doc_id ) {
 	if ( ! empty( $cached_is_wiki_term ) ) {
 		$cached_term = array_pop( $cached_is_wiki_term );
 		if ( 1 == $cached_term->slug ) {
-			$is_wiki_term = true;
+			$is_wiki_doc = true;
 		}
 	}
 
