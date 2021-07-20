@@ -5,10 +5,10 @@ Description: Add a separate Wiki section to your site. Powered by BuddyPress Doc
 Author: Boone B Gorges
 Author URI: http://boone.gorg.es
 License: GPLv3
-Version: 1.0.10
+Version: 1.0.11
 */
 
-define( 'BPDW_VERSION', '1.0.10' );
+define( 'BPDW_VERSION', '1.0.11' );
 
 function bpdw_init() {
 	require dirname(__FILE__) . '/bpdw.php';

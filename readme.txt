@@ -4,6 +4,9 @@ Stable tag: 1.0.10
 
 == Changelog ==
 
+= 1.0.11 =
+* Fixed incorrect variable name.
+
 = 1.0.10 =
 * Fixed bug related to the fetching of cached "is_wiki" values in recent versions of WordPress
 
